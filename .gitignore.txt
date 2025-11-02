@@ -1,0 +1,12 @@
+# exclude tot ce ține de WordPress core
+/wp-admin/
+/wp-includes/
+/wp-content/uploads/
+/wp-content/cache/
+/wp-content/upgrade/
+/wp-content/plugins/*
+!/wp-content/plugins/ai-product-assistant/
+/wp-content/themes/*
+!/wp-content/themes/custom-theme/
+wp-config.php
+.htaccess
