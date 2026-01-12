@@ -4,7 +4,7 @@ Plugin Name: AI Product Assistant
 Plugin URI: http://localhost/ecommerce-ai
 Description: Generează automat descrieri SEO pentru produse WooCommerce folosind un model LLM (ex: LLaMA 3 local via Ollama).
 Version: 1.0
-Author: <numele tău>
+Author: Ioneasa Cristina
 Author URI: https://github.com/<username>
 License: GPL2
 */
@@ -127,27 +127,34 @@ function ai_product_assistant_page() {
         <form id="ai-product-form">
             <input type="text" id="product_name" name="product_name" style="width: 350px;" placeholder="ex: Samsung Galaxy S24 Ultra" required />
             <input type="number" id="product_price" name="product_price" style="width: 150px; margin-left:10px;" placeholder="Preț (RON)" min="0" step="0.01" />
+            <input type="file" id="product_image" name="product_image" accept="image/*" style="margin-left:10px;" />
             <button type="submit" class="button button-primary">Generate & Add Product</button>
         </form>
         <div id="ai-result" style="margin-top:20px;"></div>
     </div>
 
-    <script type="text/javascript">
-    jQuery(document).ready(function($){
+  <script type="text/javascript">
+    jQuery(function($){
         $('#ai-product-form').on('submit', function(e){
             e.preventDefault();
-            const name = $('#product_name').val();
+
+            const formData = new FormData();
+            formData.append('action', 'ai_add_product');
+            formData.append('product_name', $('#product_name').val());
+            formData.append('product_price', $('#product_price').val());
+
+            const file = $('#product_image')[0].files[0];
+            if (file) formData.append('product_image', file);
 
             $('#ai-result').html('<p>⏳ Generating product with AI...</p>');
 
             $.ajax({
                 url: ajaxurl,
                 method: 'POST',
-                data: {
-                    action: 'ai_add_product',
-                    product_name: name
-                },
-                success: function(response) {
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response){
                     if(response.success){
                         $('#ai-result').html('<p>✅ ' + response.data + '</p>');
                     } else {
@@ -157,7 +164,8 @@ function ai_product_assistant_page() {
             });
         });
     });
-    </script>
+</script>
+
     <?php
 }
 
@@ -171,6 +179,7 @@ add_action('wp_ajax_ai_add_product', function() {
     }
 
     $product_name = sanitize_text_field($_POST['product_name']);
+    $price = isset($_POST['product_price']) ? floatval($_POST['product_price']) : 0;
 
     // 1. Generăm descrierea și detaliile produsului cu AI
     $prompt = "Scrie o descriere SEO profesională, clară și convingătoare pentru produsul:
@@ -210,10 +219,25 @@ add_action('wp_ajax_ai_add_product', function() {
     $product = new WC_Product_Simple();
     $product->set_name($product_name);
     $product->set_description($description);
-    $product->set_regular_price('1000'); // preț default, îl poți edita ulterior
+    $product->set_regular_price((string)$price); 
     $product->save();
 
     $product_id = $product->get_id();
+
+    if (!empty($_FILES['product_image']['name'])) {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        require_once ABSPATH . 'wp-admin/includes/media.php';
+        require_once ABSPATH . 'wp-admin/includes/image.php';
+
+        $attachment_id = media_handle_upload('product_image', $product_id);
+
+        if (is_wp_error($attachment_id)) {
+            wp_send_json_error('Imaginea nu a putut fi încărcată: ' . $attachment_id->get_error_message());
+        }
+
+        set_post_thumbnail($product_id, $attachment_id);
+}
+
     $edit_link = get_edit_post_link($product_id, '');
     wp_send_json_success('Produsul "' . $product_name . '" a fost adăugat cu succes! <a href="' . esc_url($edit_link) . '">Editează produsul</a>');
 
