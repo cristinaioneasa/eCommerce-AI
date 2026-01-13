@@ -1,13 +1,11 @@
-Iată traducerea și formatarea textului în limba română, păstrând stilul profesional de documentație tehnică pentru un fișier README.md:
-
-AI Product Assistant – WooCommerce + Ollama (LLaMA 3)
+## AI Product Assistant – WooCommerce + Ollama (LLaMA 3)
 Acest proiect este un plugin de WordPress care integrează un model de limbaj de mari dimensiuni (LLM) local, folosind Ollama (LLaMA 3), cu scopul de a automatiza generarea conținutului pentru produsele dintr-o platformă e-commerce WooCommerce.
 
 Sistemul suportă două scenarii principale de utilizare:
 
-Editare produse asistată de AI: generează descrieri optimizate SEO direct în editorul de produse WooCommerce.
+* Editare produse asistată de AI: generează descrieri optimizate SEO direct în editorul de produse WooCommerce.
 
-Creare automată a produselor: creează produse complete (nume, descriere, preț, imagine, categorie) dintr-o singură interfață de administrare.
+* Creare automată a produselor: creează produse complete (nume, descriere, preț, imagine, categorie) dintr-o singură interfață de administrare.
 
 ### 1. Caracteristici principale
 Generare descrieri SEO: Creează descrieri de produs optimizate folosind un LLM local.
